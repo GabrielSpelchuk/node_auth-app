@@ -23,6 +23,11 @@ export const User = client.define(
     activationToken: {
       type: DataTypes.STRING,
     },
+
+    resetToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: 'users',

@@ -14,3 +14,6 @@ authRoute.get(
 
 authRoute.get('/refresh', catchError(authController.refresh));
 authRoute.post('/logout', catchError(authController.logout));
+
+authRoute.post('/forgot-password', authController.forgotPassword);
+authRoute.post('/reset-password', authController.resetPassword);

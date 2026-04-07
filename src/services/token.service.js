@@ -18,8 +18,8 @@ function getByToken(refreshToken) {
   return Token.findOne({ where: { refreshToken } });
 }
 
-function remove(userId) {
-  Token.destroy({ where: { userId } });
+async function remove(userId) {
+  await Token.destroy({ where: { userId } });
 }
 
 export const tokenService = { save, getByToken, remove };

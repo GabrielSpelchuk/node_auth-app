@@ -32,4 +32,22 @@ async function register(name, email, password) {
   await emailService.sendActivationEmail(email, activationToken);
 }
 
-export const userService = { normalize, findByEmail, register };
+const updateResetToken = async (userId, resetToken) => {
+  const user = await User.update({ resetToken }, { where: { id: userId } });
+
+  return user;
+};
+
+const findByResetToken = async (resetToken) => {
+  const user = await User.findOne({ where: { resetToken } });
+
+  return user;
+};
+
+export const userService = {
+  normalize,
+  findByEmail,
+  register,
+  updateResetToken,
+  findByResetToken,
+};
