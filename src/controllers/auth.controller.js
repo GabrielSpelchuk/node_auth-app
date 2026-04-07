@@ -1,11 +1,12 @@
-import bcrypt from 'bcrypt';
+const bcrypt = require('bcrypt');
+const nodeCrypto = require('crypto');
 
-import { User } from '../models/user.js';
-import { userService } from '../services/user.service.js';
-import { jwtService } from '../services/jwt.service.js';
-import { ApiError } from '../exeptions/api.error.js';
-import { tokenService } from '../services/token.service.js';
-import { emailService } from '../services/email.service.js';
+const { User } = require('../models/user');
+const { userService } = require('../services/user.service');
+const { jwtService } = require('../services/jwt.service');
+const { ApiError } = require('../exeptions/api.error');
+const { tokenService } = require('../services/token.service');
+const { emailService } = require('../services/email.service');
 
 const validateName = (value) => {
   if (!value.trim()) {
@@ -105,7 +106,7 @@ const forgotPassword = async (req, res) => {
     throw ApiError.badRequest('User with this email does not exist');
   }
 
-  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetToken = nodeCrypto.randomBytes(32).toString('hex');
 
   await userService.updateResetToken(user.id, resetToken);
 
@@ -179,7 +180,7 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
-export const authController = {
+module.exports = {
   registration,
   activate,
   login,

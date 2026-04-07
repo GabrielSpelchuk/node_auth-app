@@ -1,11 +1,18 @@
-import { ApiError } from '../exeptions/api.error';
-import { User } from '../models/user';
-import bcrypt from 'bcrypt';
-import { userService } from '../services/user.service';
-import { emailService } from '../services/email.service';
+const User = require('../models/user');
+const bcrypt = require('bcrypt');
+const userService = require('../services/user.service');
+const emailService = require('../services/email.service');
+const ApiError = require('../exeptions/api.error');
 
 const updateProfile = async (req, res) => {
-  const { name, email, password, confirmation, oldPassword } = req.body;
+  const {
+    name,
+    email,
+    password,
+    emailConfirmation,
+    confirmation,
+    oldPassword,
+  } = req.body;
   const user = await User.findByPk(req.user.id);
 
   const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
@@ -14,15 +21,12 @@ const updateProfile = async (req, res) => {
     throw ApiError.badRequest('Incorrect old password');
   }
 
-  if (password) {
-    if (password !== confirmation) {
-      throw ApiError.badRequest('Passwords do not match');
-    }
-    user.password = await bcrypt.hash(password, 10);
-  }
-
   if (email && email !== user.email) {
     const oldEmail = user.email;
+
+    if (email !== emailConfirmation) {
+      throw ApiError.badRequest('Email confirmation does not match');
+    }
 
     user.email = email;
 
@@ -33,10 +37,17 @@ const updateProfile = async (req, res) => {
     );
   }
 
+  if (password) {
+    if (password !== confirmation) {
+      throw ApiError.badRequest('Passwords do not match');
+    }
+    user.password = await bcrypt.hash(password, 10);
+  }
+
   user.name = name || user.name;
   await user.save();
 
   res.send(userService.normalize(user));
 };
 
-export const userController = { updateProfile };
+module.exports = { updateProfile };

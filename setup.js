@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
-import 'dotenv/config';
-import { User } from './src/models/user.js';
-import { Token } from './src/models/token.js';
-import { client } from './src/utils/db.js';
+require('dotenv').config();
+
+const { User } = require('./src/models/user');
+const { Token } = require('./src/models/token');
+const { client } = require('./src/utils/db');
 
 client.sync({ force: true });

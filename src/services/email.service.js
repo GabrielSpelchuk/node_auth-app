@@ -1,5 +1,6 @@
-import 'dotenv/config';
-import nodemailer from 'nodemailer';
+require('dotenv').config();
+
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -37,7 +38,7 @@ function sendResetPasswordEmail(email, token) {
   return send({ email, html, subject: 'Reset your password' });
 }
 
-export const emailService = {
+module.exports = {
   sendActivationEmail,
   send,
   sendResetPasswordEmail,

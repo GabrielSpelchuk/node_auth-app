@@ -1,14 +1,16 @@
 /* eslint-disable no-console */
 'use strict';
 
-import express from 'express';
-import 'dotenv/config';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
+const express = require('express');
 
-import { authRoute } from './routes/auth.route.js';
-import { errorMiddleware } from './middlewares/errorMiddleware.js';
-import { userRouter } from './routes/user.route.js';
+require('dotenv').config();
+
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+
+const { authRoute } = require('./routes/auth.route');
+const { userRouter } = require('./routes/user.route');
+const { errorMiddleware } = require('./middlewares/errorMiddleware');
 
 const PORT = process.env.PORT || 3005;
 

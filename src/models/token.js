@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize';
-import { client } from '../utils/db.js';
-import { User } from './user.js';
+const DataTypes = require('sequelize');
+const client = require('../utils/db.js');
+const User = require('./user.js');
 
-export const Token = client.define(
+const Token = client.define(
   'Token',
   {
     refreshToken: {
@@ -17,3 +17,5 @@ export const Token = client.define(
 
 Token.belongsTo(User);
 User.hasOne(Token);
+
+module.exports = { Token };

@@ -1,7 +1,7 @@
-import { ApiError } from '../exeptions/api.error.js';
-import { User } from '../models/user';
-import { emailService } from '../services/email.service.js';
-import { v4 as uuidv4 } from 'uuid';
+const { ApiError } = require('../exeptions/api.error');
+const { User } = require('../models/user');
+const { emailService } = require('../services/email.service');
+const { v4: uuidv4 } = require('uuid');
 
 function normalize({ name, id, email }) {
   return { name, id, email };
@@ -44,10 +44,20 @@ const findByResetToken = async (resetToken) => {
   return user;
 };
 
-export const userService = {
+const updatePassword = async (userId, hashedPassword) => {
+  const user = await User.update(
+    { password: hashedPassword, resetToken: null },
+    { where: { id: userId } },
+  );
+
+  return user;
+};
+
+module.exports = {
   normalize,
   findByEmail,
   register,
   updateResetToken,
   findByResetToken,
+  updatePassword,
 };
