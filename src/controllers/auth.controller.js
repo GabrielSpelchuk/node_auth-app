@@ -5,6 +5,7 @@ import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 import { tokenService } from '../services/token.service.js';
+import { emailService } from '../services/email.service.js';
 
 const validateName = (value) => {
   if (!value.trim()) {
@@ -83,13 +84,49 @@ const login = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
+  if (user.activationToken) {
+    throw ApiError.badRequest('Please activate your email');
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
   }
 
-  generateTokens(res, user);
+  await generateTokens(res, user);
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await userService.findByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('User with this email does not exist');
+  }
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  await userService.updateResetToken(user.id, resetToken);
+
+  await emailService.sendResetPasswordMail(email, resetToken);
+
+  res.send({ message: 'Reset link sent to your email' });
+};
+
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  const user = await userService.findByResetToken(token);
+
+  if (!user) {
+    throw ApiError.badRequest('Invalid or expired reset token');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await userService.updatePassword(user.id, hashedPassword);
+
+  res.send({ message: 'Password has been reset' });
 };
 
 const refresh = async (req, res) => {
@@ -105,7 +142,7 @@ const refresh = async (req, res) => {
 
   const user = await userService.findByEmail(userData.email);
 
-  generateTokens(res, user);
+  await generateTokens(res, user);
 };
 
 const generateTokens = async (res, user) => {
@@ -139,7 +176,7 @@ const logout = async (req, res) => {
 
   await tokenService.remove(user.id);
 
-  res.statusStatus(204);
+  res.sendStatus(204);
 };
 
 export const authController = {
@@ -148,4 +185,6 @@ export const authController = {
   login,
   refresh,
   logout,
+  forgotPassword,
+  resetPassword,
 };
